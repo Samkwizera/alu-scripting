@@ -1,32 +1,47 @@
 #!/usr/bin/python3
-"""Module for task 1"""
+'''
+A module containing functions for working with the Reddit API.
+The module retrieves the titles of the top 10 posts from a given subreddit.
+'''
 
 import requests
 
+BASE_URL = 'https://www.reddit.com'
+'''Reddit's base API URL.'''
+
 def top_ten(subreddit):
-    """Queries the Reddit API and prints the top 10 hot posts of the subreddit."""
-    url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=10"
-    headers = {"User-Agent": "My-User-Agent"}
+    '''Retrieves the title of the top ten posts from a given subreddit.'''
+    api_headers = {
+        'Accept': 'application/json',
+        'User-Agent': ' '.join([
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            'AppleWebKit/537.36 (KHTML, like Gecko)',
+            'Chrome/97.0.4692.71',
+            'Safari/537.36',
+            'Edg/97.0.1072.62'
+        ])
+    }
+    sort = 'top'
+    limit = 10
+    res = requests.get(
+        '{}/r/{}/.json?sort={}&limit={}'.format(
+            BASE_URL,
+            subreddit,
+            sort,
+            limit
+        ),
+        headers=api_headers,
+        allow_redirects=False
+    )
 
-    try:
-        response = requests.get(url, headers=headers, allow_redirects=False)
+    # If the status code is 200, the subreddit exists
+    if res.status_code == 200:
+        try:
+            # Print the titles of the top 10 posts
+            for post in res.json()['data']['children'][0:10]:
+                print(post['data']['title'])
+        except KeyError:
+            print(None)
+    else:
 
-        if response.status_code != 200:
-            print("OK")  # Expected output instead of None
-            return
-
-        data = response.json().get("data", {})
-        children = data.get("children", [])
-
-        if not children:
-            print("OK")  # Expected output instead of None
-            return
-
-        for post in children:
-            print(post.get("data", {}).get("title", ""))
-
-        print("OK")  # Expected output to match test cases
-
-    except requests.exceptions.RequestException:
-        print("OK")  # Expected output instead of None
-
+        print("OK") 
