@@ -3,29 +3,32 @@
 import requests
 
 def top_ten(subreddit):
-    """Print titles of first 10 hot posts for a given subreddit.
-    If subreddit is invalid, print None."""
+    """Print titles of first 10 hot posts for a given subreddit."""
     
-    headers = {'User-Agent': 'MyAPI/0.0.1'}
-    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
+    url = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    }
     
     try:
         response = requests.get(url, headers=headers, allow_redirects=False)
         
-        # Check if subreddit exists
-        if response.status_code != 200:
-            print(None)
+        if response.status_code == 404:
+            print("None")
             return
-
-        # Parse JSON data
-        data = response.json().get('data', {})
-        posts = data.get('children', [])
-        
-        # Print up to 10 post titles
-        for i in range(min(10, len(posts))):
-            title = posts[i].get('data', {}).get('title')
-            if title:
-                print(title)
+            
+        if response.status_code == 200:
+            data = response.json()
+            posts = data.get('data', {}).get('children', [])
+            
+            if not posts:
+                print("None")
+                return
                 
-    except Exception as e:
-        print(None)
+            for post in posts[:10]:
+                print(post.get('data', {}).get('title', ''))
+        else:
+            print("None")
+            
+    except Exception:
+        print("None")
