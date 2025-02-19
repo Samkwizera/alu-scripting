@@ -32,3 +32,11 @@ def top_ten(subreddit):
             
     except Exception:
         print("None")
+
+if __name__ == '__main__':
+    # Test cases
+    print("Testing with 'python' subreddit:")
+    top_ten('python')
+    
+    print("\nTesting with non-existent subreddit:")
+    top_ten('this_subreddit_does_not_exist')
